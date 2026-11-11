@@ -17,6 +17,9 @@ PARAM_GRID = {
 }
 
 IRIS_MAX_ITER = 500
+MNIST_MAX_ITER = 100
+# Full MNIST grid search is slow — search on a stratified subset, then refit
+MNIST_GRID_SAMPLES = 8000
 
 
 def dataset_to_xy(dataset):

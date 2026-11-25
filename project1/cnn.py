@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import shutil
 import random
+from PIL import Image
+import numpy as np
 
 PROJECT_ROOT_PATH = Path("/home/latarnik3/studies/neural_networks/project1")
 DATA_PATH = PROJECT_ROOT_PATH / "data/brain_tumor_mri"
@@ -36,6 +38,18 @@ def create_validation_set(validation_set_ratio: float = 0.15, seed: int = 37):
                         print("Error occurred while copying: ", e)
                     temp += 1
 
+
+def data_preprocessing():
+    for path in DATA_PATH.rglob("*"):
+        if not path.is_file():
+            continue
+
+        with Image.open(path) as img:
+            img = img.convert("RGB").resize((256, 256))
+            raw_image_matrix = np.array(img)
+            processed_image_matrix = raw_image_matrix / 255.0
+
+        
 
 if __name__ == "__main__":
     create_validation_set()

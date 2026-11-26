@@ -2,6 +2,7 @@ import csv
 import random
 from pathlib import Path
 import numpy as np
+import pandas as pd
 
 PROJECT_DIR = Path(__file__).resolve().parent
 DATA_PATH = PROJECT_DIR / "data/weather_type"
@@ -19,6 +20,14 @@ CATEGORICAL_LABELS = {
     "Location": ("coastal", "inland", "mountain"),
 }
 
+ONE_HOT_CLOUD_COVER = {"clear": 0, "cloudy": 1, "overcast": 2, "partly cloudy": 3}
+ONE_HOT_SEASON = {"Autumn": 0, "Spring": 1, "Summer": 2, "Winter": 3}
+ONE_HOT_LOCATION = {"coastal": 0, "inland": 1, "mountain": 2}
+
+def clean_humidity_data():
+    df = pd.read_csv('weather_classification_data.csv')
+    df = df[df['Humidity'] < 101]
+    df.to_csv('weather_classification_data_cleaned.csv', index=False)
 
 def read_csv(path: Path):
     with path.open(newline="") as f:
@@ -107,5 +116,6 @@ def data_preprocessing():
 
 
 if __name__ == "__main__":
+    clean_humidity_data()
     create_validation_set()
     create_test_set()

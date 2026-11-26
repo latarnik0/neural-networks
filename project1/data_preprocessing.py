@@ -3,12 +3,13 @@ import random
 from pathlib import Path
 import numpy as np
 
-PROJECT_ROOT_PATH = Path(__file__).parent
-DATA_PATH = PROJECT_ROOT_PATH / "data/weather_type"
+PROJECT_DIR = Path(__file__).resolve().parent
+DATA_PATH = PROJECT_DIR / "data/weather_type"
 SOURCE_CSV_PATH = DATA_PATH / "weather_classification_data.csv"
-TRAINING_SET_PATH = DATA_PATH / "Training" / "weather.csv"
-VALIDATION_SET_PATH = DATA_PATH / "Validation" / "weather.csv"
-TESTING_SET_PATH = DATA_PATH / "Testing" / "weather.csv"
+TRAINING_SET_PATH = DATA_PATH / "Training" / "training_weather.csv"
+VALIDATION_SET_PATH = DATA_PATH / "Validation" / "validation_weather.csv"
+TESTING_SET_PATH = DATA_PATH / "Testing" / "testing_weather.csv"
+
 TARGET_COLUMN = "Weather Type"
 IGNORED_COLUMNS = {TARGET_COLUMN}
 TARGET_LABELS = ("Cloudy", "Rainy", "Snowy", "Sunny")

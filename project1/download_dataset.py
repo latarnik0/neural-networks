@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+import csv
 import shutil
 import sys
 from pathlib import Path
 
-DATASET = "masoudnickparvar/brain-tumor-mri-dataset"
-CLASSES = ("glioma", "meningioma", "pituitary", "notumor")
+DATASET = "nikhil7280/weather-type-classification"
+CSV_NAME = "weather_classification_data.csv"
 
 PROJECT_DIR = Path(__file__).resolve().parent
-DATA_DIR = PROJECT_DIR / "data" / "brain_tumor_mri"
+DATA_DIR = PROJECT_DIR / "data" / "weather_type"
 
 
 def _ensure_kagglehub() -> None:
@@ -30,33 +31,35 @@ def download() -> Path:
     cache_path = Path(kagglehub.dataset_download(DATASET))
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    for item in cache_path.iterdir():
-        dest = DATA_DIR / item.name
-        if dest.exists():
-            continue
-        if item.is_dir():
-            shutil.copytree(item, dest)
-        else:
-            shutil.copy2(item, dest)
+    source = cache_path / CSV_NAME
+    if not source.is_file():
+        matches = list(cache_path.rglob(CSV_NAME))
+        if not matches:
+            raise FileNotFoundError(f"{CSV_NAME} not found in {cache_path}")
+        source = matches[0]
 
-    return DATA_DIR
+    dest = DATA_DIR / CSV_NAME
+    shutil.copy2(source, dest)
+    return dest
 
 
-def summarize(root: Path) -> None:
-    print(f"Dataset root: {root}")
-    for split in ("Training", "Testing"):
-        split_dir = root / split
-        if not split_dir.is_dir():
-            alt = root / split.lower()
-            split_dir = alt if alt.is_dir() else split_dir
-        if not split_dir.is_dir():
-            print(f"  missing split: {split}")
-            continue
-        print(f"  {split_dir.name}/")
-        for cls in CLASSES:
-            cls_dir = split_dir / cls
-            n = len(list(cls_dir.glob("*"))) if cls_dir.is_dir() else 0
-            print(f"    {cls}: {n} images")
+def summarize(csv_path: Path) -> None:
+    with csv_path.open(newline="") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        fieldnames = reader.fieldnames or []
+
+    weather_type_counts: dict[str, int] = {}
+    for row in rows:
+        weather_type = row["Weather Type"]
+        weather_type_counts[weather_type] = weather_type_counts.get(weather_type, 0) + 1
+
+    print(f"Dataset file: {csv_path}")
+    print(f"  rows: {len(rows)}")
+    print(f"  columns: {', '.join(fieldnames)}")
+    print("  Weather Type:")
+    for weather_type in sorted(weather_type_counts):
+        print(f"    {weather_type}: {weather_type_counts[weather_type]}")
 
 
 def main() -> None:
